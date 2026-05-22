@@ -1,0 +1,42 @@
+<a href="{{ routes.root_url }}pages/wishlist" class="wl-header-icon" id="wl-header-link">
+  <svg viewBox="0 0 24 24" class="wl-header-heart"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5 2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.53L12 21.35z"/></svg>
+  <span class="wl-header-count" id="wl-header-count" style="display:none">0</span>
+</a>
+<style>
+.wl-header-icon{position:relative;display:inline-flex;align-items:center;text-decoration:none;color:inherit;padding:4px}
+.wl-header-heart{width:24px;height:24px;fill:none;stroke:#e91e63;stroke-width:2;transition:fill 0.2s}
+.wl-header-icon:hover .wl-header-heart{fill:#e91e63}
+.wl-header-count{position:absolute;top:-6px;right:-6px;background:#e91e63;color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+</style>
+<script>
+(function(){
+  {% if customer %}
+  var APP_URL = {{ block.settings.app_url | json }};
+  var SHOP = {{ shop.permanent_domain | json }};
+  var CID = {{ customer.id | json }};
+  fetch(APP_URL+'/api/wishlist/count',{headers:{'X-Shopify-Shop':SHOP,'X-Customer-Id':CID}})
+    .then(function(r){return r.json()})
+    .then(function(d){
+      if(d.success && d.count > 0){
+        var el = document.getElementById('wl-header-count');
+        el.textContent = d.count;
+        el.style.display = 'flex';
+      }
+    }).catch(function(){});
+  {% endif %}
+})();
+</script>
+{% schema %}
+{
+  "name": "Wishlist Header Icon",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "app_url",
+      "label": "App URL",
+      "default": "https://your-app-url.com"
+    }
+  ]
+}
+{% endschema %}

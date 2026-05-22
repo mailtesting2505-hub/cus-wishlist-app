@@ -1,0 +1,56 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id          String    @id
+  shop        String
+  state       String
+  isOnline    Boolean   @default(false)
+  scope       String?
+  expires     DateTime?
+  accessToken String
+  userId      BigInt?
+  firstName   String?
+  lastName    String?
+  email       String?
+  accountOwner Boolean  @default(false)
+  locale      String?
+  collaborator Boolean?  @default(false)
+  emailVerified Boolean? @default(false)
+}
+
+model Wishlist {
+  id         Int      @id @default(autoincrement())
+  customerId String
+  shop       String
+  productId  String
+  variantId  String?
+  productTitle String
+  productImage String?
+  productPrice String?
+  productHandle String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([customerId, shop, productId])
+  @@index([customerId, shop])
+}
+
+model Customer {
+  id         Int      @id @default(autoincrement())
+  customerId String
+  shop       String
+  email      String
+  name       String?
+  createdAt  DateTime @default(now())
+  
+  @@unique([customerId, shop])
+}

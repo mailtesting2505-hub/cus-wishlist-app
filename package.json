@@ -1,0 +1,19 @@
+{
+  "name": "shopify-wishlist-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "shopify app dev",
+    "build": "shopify app build",
+    "deploy": "shopify app deploy",
+    "generate": "shopify app generate"
+  },
+  "workspaces": [
+    "web",
+    "extensions/*"
+  ],
+  "dependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

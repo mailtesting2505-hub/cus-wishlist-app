@@ -1,0 +1,22 @@
+name = "shopify-wishlist-app"
+client_id = "YOUR_CLIENT_ID_HERE"
+application_url = "https://YOUR_APP_URL.com"
+embedded = true
+
+[access_scopes]
+scopes = "read_products,write_customers,read_customers"
+
+[auth]
+redirect_urls = [
+  "https://YOUR_APP_URL.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-01"
+
+  [[webhooks.subscriptions]]
+  topics = ["app/uninstalled"]
+  uri = "/api/webhooks"
+
+[pos]
+embedded = false

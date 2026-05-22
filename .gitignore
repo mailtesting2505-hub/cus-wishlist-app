@@ -1,0 +1,8 @@
+node_modules/
+.env
+*.db
+*.db-journal
+web/frontend/dist/
+.shopify/
+dist/
+.DS_Store

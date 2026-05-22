@@ -1,0 +1,105 @@
+{% comment %}Wishlist Button Block{% endcomment %}
+<div id="wishlist-btn-wrapper">
+  <button id="wishlist-toggle-btn" class="wishlist-btn"
+    data-product-id="{{ product.id }}"
+    data-product-title="{{ product.title | escape }}"
+    data-product-image="{{ product.featured_image | image_url: width: 300 }}"
+    data-product-price="{{ product.price | money_without_currency }}"
+    data-product-handle="{{ product.handle }}">
+    <svg class="wishlist-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5 2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.53L12 21.35z"/></svg>
+    <span class="wishlist-btn-text">{{ block.settings.button_text }}</span>
+  </button>
+  <div id="wishlist-count-badge" style="display:none">
+    <a href="{{ routes.root_url }}pages/wishlist" class="wishlist-count-link">❤️ View Wishlist (<span id="wishlist-count">0</span>)</a>
+  </div>
+</div>
+<div id="wishlist-login-modal" class="wishlist-modal" style="display:none">
+  <div class="wishlist-modal-content">
+    <button class="wishlist-modal-close" id="close-wishlist-modal">&times;</button>
+    <div style="font-size:48px;margin-bottom:16px">💝</div>
+    <h2>Save to Your Wishlist</h2>
+    <p>Log in or create an account to save products you love!</p>
+    <div class="wishlist-modal-buttons">
+      <a href="{{ routes.account_login_url }}" class="wishlist-btn-login">Log In</a>
+      <a href="{{ routes.account_register_url }}" class="wishlist-btn-signup">Sign Up Free</a>
+    </div>
+  </div>
+</div>
+<div id="wishlist-modal-overlay" style="display:none"></div>
+<div id="wishlist-toast" class="wishlist-toast" style="display:none"></div>
+<style>
+.wishlist-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:#fff;border:2px solid #e0e0e0;border-radius:50px;cursor:pointer;font-size:14px;font-weight:600;color:#333;transition:all 0.3s;margin:8px 0}
+.wishlist-btn:hover{border-color:#e91e63;color:#e91e63;transform:translateY(-1px);box-shadow:0 4px 12px rgba(233,30,99,0.15)}
+.wishlist-btn.active{background:#fce4ec;border-color:#e91e63;color:#e91e63}
+.wishlist-heart{width:20px;height:20px;fill:#ccc;transition:fill 0.3s,transform 0.3s}
+.wishlist-btn:hover .wishlist-heart,.wishlist-btn.active .wishlist-heart{fill:#e91e63;transform:scale(1.2)}
+.wishlist-count-link{display:inline-block;margin-top:8px;color:#e91e63;text-decoration:none;font-size:13px;font-weight:500}
+.wishlist-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;border-radius:20px;padding:40px;text-align:center;z-index:100001;max-width:400px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.2)}
+#wishlist-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100000}
+.wishlist-modal-close{position:absolute;top:16px;right:20px;background:none;border:none;font-size:24px;cursor:pointer;color:#999}
+.wishlist-modal-content h2{margin:0 0 12px;font-size:22px;color:#222}
+.wishlist-modal-content p{color:#666;font-size:14px;line-height:1.6;margin-bottom:24px}
+.wishlist-modal-buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.wishlist-btn-login,.wishlist-btn-signup{padding:12px 28px;border-radius:50px;text-decoration:none;font-weight:600;font-size:14px;transition:all 0.2s}
+.wishlist-btn-login{background:#fff;border:2px solid #e91e63;color:#e91e63}
+.wishlist-btn-signup{background:#e91e63;border:2px solid #e91e63;color:#fff}
+.wishlist-toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:14px 28px;border-radius:50px;font-size:14px;font-weight:500;z-index:200000;box-shadow:0 8px 24px rgba(0,0,0,0.2)}
+</style>
+<script>
+(function(){
+var A={% if block.settings.app_url != blank %}{{ block.settings.app_url | json }}{% else %}"https://your-app-url.com"{% endif %};
+var S={{ shop.permanent_domain | json }};
+var C={{ customer.id | default: '' | json }};
+var pid={{ product.id | json }};
+var btn=document.getElementById('wishlist-toggle-btn');
+var modal=document.getElementById('wishlist-login-modal');
+var overlay=document.getElementById('wishlist-modal-overlay');
+var toast=document.getElementById('wishlist-toast');
+var countBadge=document.getElementById('wishlist-count-badge');
+var countEl=document.getElementById('wishlist-count');
+var inWishlist=false;
+function showToast(m){toast.textContent=m;toast.style.display='block';setTimeout(function(){toast.style.display='none'},3000)}
+function setActive(a){inWishlist=a;if(a){btn.classList.add('active');btn.querySelector('.wishlist-btn-text').textContent='Wishlisted ♥'}else{btn.classList.remove('active');btn.querySelector('.wishlist-btn-text').textContent={{ block.settings.button_text | json }}}}
+function closeModal(){modal.style.display='none';overlay.style.display='none'}
+if(C){
+  fetch(A+'/api/wishlist/check/'+pid,{headers:{'X-Shopify-Shop':S,'X-Customer-Id':C}}).then(function(r){return r.json()}).then(function(d){if(d.success&&d.inWishlist)setActive(true)}).catch(function(){});
+  fetch(A+'/api/wishlist/count',{headers:{'X-Shopify-Shop':S,'X-Customer-Id':C}}).then(function(r){return r.json()}).then(function(d){if(d.success&&d.count>0){countEl.textContent=d.count;countBadge.style.display='block'}}).catch(function(){});
+}
+btn.addEventListener('click',async function(){
+  if(!C){modal.style.display='block';overlay.style.display='block';return}
+  var pd={productId:btn.dataset.productId,productTitle:btn.dataset.productTitle,productImage:btn.dataset.productImage,productPrice:btn.dataset.productPrice,productHandle:btn.dataset.productHandle};
+  if(inWishlist){
+    var r=await fetch(A+'/api/wishlist/'+pid,{method:'DELETE',headers:{'X-Shopify-Shop':S,'X-Customer-Id':C}});
+    var d=await r.json();
+    if(d.success){setActive(false);showToast('❌ Removed from wishlist');fetch(A+'/api/wishlist/count',{headers:{'X-Shopify-Shop':S,'X-Customer-Id':C}}).then(function(r){return r.json()}).then(function(d){if(d.count>0){countEl.textContent=d.count}else{countBadge.style.display='none'}})}
+  }else{
+    var r=await fetch(A+'/api/wishlist',{method:'POST',headers:{'Content-Type':'application/json','X-Shopify-Shop':S,'X-Customer-Id':C},body:JSON.stringify(pd)});
+    var d=await r.json();
+    if(d.success){setActive(true);showToast('💝 Added to wishlist!');countEl.textContent=(parseInt(countEl.textContent)||0)+1;countBadge.style.display='block'}
+    else if(d.requireLogin){modal.style.display='block';overlay.style.display='block'}
+  }
+});
+document.getElementById('close-wishlist-modal').addEventListener('click',closeModal);
+overlay.addEventListener('click',closeModal);
+})();
+</script>
+{% schema %}
+{
+  "name": "Wishlist Button",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Add to Wishlist"
+    },
+    {
+      "type": "text",
+      "id": "app_url",
+      "label": "App URL",
+      "default": "https://your-app-url.com"
+    }
+  ]
+}
+{% endschema %}
