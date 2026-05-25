@@ -4,8 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon index.js",
-    "build": "cd frontend && npm run build",
-    "start": "cross-env NODE_ENV=production node index.js"
+    "build": "cd frontend && npm install && npm run build",
+    "start": "node index.js"
   },
   "dependencies": {
     "@prisma/client": "^5.7.0",
