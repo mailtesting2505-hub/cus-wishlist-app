@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
+// enough when changing adapters.
+// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
+datasource db {
+  provider = "sqlite"
+  url      = "file:dev.sqlite"
+}
+
+model Session {
+  id            String    @id
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+  refreshToken        String?
+  refreshTokenExpires DateTime?
+}
+
+model WishlistItem {
+  id           String   @id @default(cuid())
+  shop         String
+  customerId   String
+  productId    String
+  variantId    String
+  handle       String
+  title        String
+  variantTitle String?
+  image        String?
+  price        String?
+  url          String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([shop, customerId, productId, variantId])
+  @@index([shop, customerId])
+  @@index([shop, productId])
+}
+
+model WishlistSettings {
+  shop                    String   @id
+  enabled                 Boolean  @default(true)
+
+  guestWishlist           Boolean  @default(true)
+  loginRequired           Boolean  @default(false)
+  mergeGuestOnLogin       Boolean  @default(true)
+
+  productButtonEnabled    Boolean  @default(true)
+  collectionButtonEnabled Boolean  @default(true)
+  buttonText              String   @default("Add to wishlist")
+  buttonAddedText         String   @default("Wishlisted")
+  primaryColor            String   @default("#17130F")
+  activeColor             String   @default("#D92D20")
+  iconSize                Int      @default(22)
+  buttonRadius            Int      @default(8)
+
+  floatingLauncherEnabled Boolean  @default(true)
+  headerCounterEnabled    Boolean  @default(false)
+  launcherPosition        String   @default("bottom-right")
+
+  pageTitle               String   @default("My Wishlist")
+  emptyText               String   @default("Your wishlist is empty.")
+  pageHandle              String   @default("wishlist")
+  columnsDesktop          Int      @default(4)
+  columnsMobile           Int      @default(2)
+  showPrices              Boolean  @default(true)
+  showVariant             Boolean  @default(true)
+  showAddToCart           Boolean  @default(true)
+  showRemove              Boolean  @default(true)
+
+  toastEnabled            Boolean  @default(true)
+
+  customProductSelector   String   @default("")
+  customCardSelector      String   @default("")
+  customHeaderSelector    String   @default("")
+
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+

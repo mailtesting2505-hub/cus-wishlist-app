@@ -1,0 +1,12 @@
+<div data-iwc-embed hidden></div>
+
+{{ 'wishlist.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'wishlist.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Custom Wishlist",
+  "target": "body",
+  "settings": []
+}
+{% endschema %}
