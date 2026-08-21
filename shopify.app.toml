@@ -2,7 +2,7 @@
 
 client_id = "cfe55e49362587d7a1d7fcf1367a9d4a"
 name = "custom-wishlist"
-application_url = "https://example.com"
+application_url = "https://cus-wishlist-app-production.up.railway.app"
 embedded = true
 
 [build]
@@ -33,7 +33,7 @@ api_version = "2026-10"
 scopes = "write_products,read_customers"
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = ["https://cus-wishlist-app-production.up.railway.app/auth/callback"]
 
 [app_proxy]
 url = "/wishlist-proxy"
