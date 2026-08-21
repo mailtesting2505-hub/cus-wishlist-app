@@ -9,7 +9,10 @@ ENV NODE_ENV=production
 
 COPY package.json package-lock.json* ./
 
-RUN npm ci --omit=dev && npm cache clean --force
+RUN npm ci --include=dev && \
+    ROLLUP_VERSION=$(node -p "require('./node_modules/rollup/package.json').version") && \
+    npm install --no-save "@rollup/rollup-linux-x64-musl@$ROLLUP_VERSION" && \
+    npm cache clean --force
 
 COPY . .
 
